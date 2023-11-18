@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>옥정고 급식</title>
+
+    <link href="https://hangeul.pstatic.net/hangeul_static/css/maru-buri.css" rel="stylesheet">
+
+    <style>
+        /* 전체 글꼴 변경 */
+        body, h1 {
+            font-family: 'MaruBuri', sans-serif;
+        }
+
+        h1 {
+            color: blue;
+            font-size: 20px;
+            text-align: center; /* "오늘의 급식" 가운데 정렬 추가 */
+        } 
+
+        /* 새로운 버튼 스타일 */
+        .custom-button {
+            width: 200px; /* 버튼의 가로 크기를 지정하세요 */
+            height: 200px; /* 버튼의 세로 크기를 지정하세요 */
+            border-radius: 50%; /* 원형 버튼을 만듭니다 */
+            background: linear-gradient(145deg, #e6e6e6, #ffffff);
+            box-shadow: 17px 17px 12px #666666, -17px -17px 12px #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 10px;
+            color: #333;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            text-decoration: none; /* 링크 효과 제거 */
+            font-family: 'MaruBuri', sans-serif; /* 마루부리 폰트 적용 */
+            color: rgb(65, 111, 203);
+        }
+
+        /* 내비게이션 바 스타일 */
+        header {
+            background-color: #1c2d84; /* 배경 색상 설정 */
+            color: #fff; /* 글꼴 색상 설정 */
+            padding: 10px 0; /* 내부 여백 설정 */
+            display: flex; /* 내비게이션 바 안의 아이템을 가로로 정렬 */
+            justify-content: space-between; /* 아이템 사이의 공간을 최대화하여 왼쪽과 오른쪽에 정렬 */
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            display: flex; /* 메뉴 항목을 가로로 정렬 */
+        }
+
+        nav li {
+            margin-right: 20px; /* 메뉴 간격 설정 (오른쪽 여백) */
+        }
+
+        nav li:first-child {
+            margin-left: 20px; /* 첫 번째 메뉴 항목을 가운데 정렬 */
+        }
+
+        nav a {
+            text-decoration: none; /* 링크 효과 제거 */
+            color: #fff; /* 링크 색상 설정 */
+        }
+    </style>
+
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#">오늘의 급식</a></li>
+            </ul>
+        </nav>
+    </header>
+
+<!-- 웹 페이지 내용 -->
+    
+</head>
+<body>
+    <div id="container" style="text-align: center;">
+        <!-- 버튼 추가 및 클래스 적용 -->
+        <button class="custom-button" 
+        id="quoteButton" 
+        style="margin: 0 auto; margin-top: 40px;">오늘의 급식</button>
+
+        <p id="quote" style="padding-top: 70px;"></p> <!-- 결과 값 주위에 20px의 여백을 추가 -->
+    </div>
+
+    <script>
+        // 데이터를 표시할 HTML 요소를 선택합니다.
+        const quoteElement = document.getElementById("quote");
+        const getDataButton = document.getElementById("quoteButton");
+        const apiKey = '209dfce9e5c34f6bae8462063be6c1ba';
+        const type = 'json';
+        const pindex = 1;
+        const pSize = 10;
+        const ATPT_OFCDC_SC_CODE = 'J10';
+        const SD_SCHUL_CODE = '7531158';
+        const MMEAL_SC_CODE = '2';
+        
+        // 현재 날짜를 생성합니다.
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = (today.getMonth() + 1).toString().padStart(2, '0');
+        const day = today.getDate().toString().padStart(2, '0');
+        const MLSV_YMD = `${year}${month}${day}`;
+
+        // API URL을 정의합니다.
+        const apiUrl = `https://open.neis.go.kr/hub/mealServiceDietInfo?ATPT_OFCDC_SC_CODE=${ATPT_OFCDC_SC_CODE}&SD_SCHUL_CODE=${SD_SCHUL_CODE}&MMEAL_SC_CODE=${MMEAL_SC_CODE}&Type=${type}&pindex=${pindex}&pSize=${pSize}&KEY=${apiKey}&MLSV_YMD=${MLSV_YMD}`;
+
+        // 데이터를 가져오고 표시하는 함수
+        function fetchDataAndDisplay() {
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    // 받아온 데이터를 처리하고 표시합니다.
+                    const meals = data.mealServiceDietInfo[1].row[0].DDISH_NM.split('<br/>');
+                    quoteElement.innerHTML = meals.join('<br>');
+                    // 버튼 숨기기
+                    getDataButton.style.display = "none";
+                })
+                .catch(error => {
+                    console.error("오류 발생:", error);
+                    quoteElement.textContent = "데이터를 가져오는 데 실패했습니다.";
+                });
+        }
+
+        // 버튼 클릭 이벤트에 데이터 가져오기 함수 연결
+        getDataButton.addEventListener("click", fetchDataAndDisplay);
+    </script>
+    
+</body>
+</html>
